@@ -1,5 +1,6 @@
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -71,6 +72,11 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         backgroundColor: context.theme.backgroundColor,
         actions: [
+          IconButton(
+            onPressed: () => _taskController.deleteAllTask(),
+            icon: Icon(Icons.cleaning_services_rounded),
+            color: Get.isDarkMode ? Colors.white : Colors.black,
+          ),
           CircleAvatar(
             backgroundImage: AssetImage('images/person.jpeg'),
             radius: 18,
@@ -159,22 +165,37 @@ class _HomePageState extends State<HomePage> {
                     int.parse(myTime.toString().split(':')[0]),
                     int.parse(myTime.toString().split(':')[1]),
                     task);
-
-                return AnimationConfiguration.staggeredList(
-                  position: index,
-                  duration: Duration(milliseconds: 1000),
-                  child: SlideAnimation(
-                    horizontalOffset: 300,
-                    child: FadeInAnimation(
-                      child: GestureDetector(
-                        onTap: () => _showBottomSheet(context, task),
-                        child: TaskTile(
-                          task: task,
+                if (task.repeat == 'Daily' ||
+                    task.date == DateFormat.yMd().format(_selectedDate) ||
+                    (task.repeat == 'Weekly' &&
+                        _selectedDate
+                                    .difference(
+                                      DateFormat.yMd().parse(task.date!),
+                                    )
+                                    .inDays %
+                                7 ==
+                            0) ||
+                    (task.repeat == 'Monthly' &&
+                        DateFormat.yMd().parse(task.date!).day ==
+                            _selectedDate.day)) {
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: Duration(milliseconds: 1000),
+                    child: SlideAnimation(
+                      horizontalOffset: 300,
+                      child: FadeInAnimation(
+                        child: GestureDetector(
+                          onTap: () => _showBottomSheet(context, task),
+                          child: TaskTile(
+                            task: task,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  return Container();
+                }
               },
             ),
           );
@@ -279,10 +300,11 @@ class _HomePageState extends State<HomePage> {
             _buildBottomSheet(
                 lable: 'Delete Task ',
                 onTap: () {
+                  notifyHelper.cancelNotification(task);
                   _taskController.deleteTask(task);
                   Get.back();
                 },
-                clr: primaryClr),
+                clr: Colors.red[300]!),
             Divider(
               color: Get.isDarkMode ? Colors.grey : darkGreyClr,
             ),

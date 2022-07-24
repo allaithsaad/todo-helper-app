@@ -1,8 +1,10 @@
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:todo/db/db_helper.dart';
 import '../models/task.dart';
+import '../services/notification_services.dart';
 
 class TaskController extends GetxController {
   final RxList<Task> taskList = <Task>[].obs;
@@ -22,6 +24,19 @@ class TaskController extends GetxController {
   void deleteTask(Task task) async {
     await DBHelper.delete(task);
     getTasks();
+  }
+
+  void deleteAllTask() async {
+    Get.defaultDialog(
+        title: 'ALert',
+        content: Text('Are You Sure You want to delete all tasks.'),
+        onConfirm: () async => {
+              await DBHelper.deleteAll(),
+              NotifyHelper().cancelAllNotification(),
+              getTasks(),
+              Get.back(),
+            },
+        onCancel: () => Get.back());
   }
 
   void markAsCompleted(int id) async {

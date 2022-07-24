@@ -28,7 +28,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   int _selectedRemind = 5;
   List<int> remindList = [5, 10, 15, 20];
   String _selectedRepeat = 'None';
-  List<String> repeatList = ['None', 'Daliy', 'Weekly', 'Monthly'];
+  List<String> repeatList = ['None', 'Daily', 'Weekly', 'Monthly'];
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +236,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   Column _colorPalette() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Color'),
         SizedBox(height: 8),
